@@ -1,0 +1,892 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     33754,        884]
+NotebookOptionsPosition[     29164,        814]
+NotebookOutlinePosition[     29886,        836]
+CellTagsIndexPosition[     29843,        833]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Coronavirus geographical distribution", "Title",
+ CellChangeTimes->{{3.7894909401290684`*^9, 
+  3.78949095460172*^9}},ExpressionUUID->"5ef32a59-2eb0-464c-9421-\
+2f95fb331b31"],
+
+Cell["plotted over time", "Subtitle",
+ CellChangeTimes->{{3.7894909745226164`*^9, 
+  3.789490980066867*^9}},ExpressionUUID->"d91b195f-a3e5-43b2-a162-\
+257a1af4c1a2"],
+
+Cell["Download the raw data to a file:", "Text",
+ CellChangeTimes->{{3.7894909871311846`*^9, 
+  3.7894910212677326`*^9}},ExpressionUUID->"d3e01a62-b50d-4d80-9af6-\
+a423bab6ce4b"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"file", "=", 
+   RowBox[{
+   "URLDownload", "[", 
+    "\"\<https://docs.google.com/spreadsheets/d/1yZv9w9zRKwrGTaR-\
+YzmAqMefw4wMlaXocejdxZaTs6w/export?format=xlsx\>\"", "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.7894807755228815`*^9, 3.7894807829039583`*^9}, {
+  3.7894810471247034`*^9, 3.7894810926931734`*^9}, {3.789486900285595*^9, 
+  3.789486903154624*^9}},
+ CellLabel->"In[79]:=",ExpressionUUID->"31aa7e4e-9860-4386-8557-4842025c3765"],
+
+Cell["Import the file as a XLSX spreadsheet:", "Text",
+ CellChangeTimes->{{3.7894910258919287`*^9, 
+  3.7894910342362905`*^9}},ExpressionUUID->"a02f6c14-4339-4fa1-ae10-\
+762609af9074"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"xlsx", "=", 
+   RowBox[{"Import", "[", 
+    RowBox[{"file", ",", "\"\<XLSX\>\""}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.789481100276252*^9, 3.789481110994364*^9}, {
+   3.7894813249015713`*^9, 3.789481326898592*^9}, 3.7894869144687243`*^9},
+ CellLabel->"In[80]:=",ExpressionUUID->"27ab572f-fac8-4aa2-bb09-23bdcc5a846a"],
+
+Cell["\<\
+Process one day of the data and convert it to a map of the world:\
+\>", "Text",
+ CellChangeTimes->{{3.789491044500739*^9, 
+  3.7894910634855676`*^9}},ExpressionUUID->"bc14904b-ad77-4963-af4d-\
+285147f3879e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ComputeCoronaVirusMap", "[", 
+   RowBox[{"data_", ",", "n_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"ds", ",", "countries", ",", "max", ",", "map", ",", "date"}], 
+     "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"ds", "=", 
+      RowBox[{
+       RowBox[{"Map", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"<|", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"\"\<region\>\"", "\[Rule]", 
+              RowBox[{
+               RowBox[{
+               "Interpreter", "[", "\"\<AdministrativeDivision\>\"", "]"}], 
+               "[", 
+               RowBox[{
+                RowBox[{"First", "[", "#", "]"}], "<>", "\"\< \>\"", "<>", 
+                RowBox[{"#", "[", 
+                 RowBox[{"[", "2", "]"}], "]"}]}], "]"}]}], "/.", 
+             RowBox[{"{", 
+              RowBox[{"_Failure", "\[Rule]", 
+               RowBox[{"Missing", "[", "\"\<NotAvailable\>\"", "]"}]}], 
+              "}"}]}], ",", "\[IndentingNewLine]", 
+            RowBox[{"\"\<country\>\"", "\[Rule]", 
+             RowBox[{
+              RowBox[{"Interpreter", "[", "\"\<Country\>\"", "]"}], "[", 
+              RowBox[{"#", "[", 
+               RowBox[{"[", "2", "]"}], "]"}], "]"}]}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"\"\<date\>\"", "\[Rule]", 
+             RowBox[{"#", "[", 
+              RowBox[{"[", "3", "]"}], "]"}]}], ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"\"\<cases\>\"", "\[Rule]", 
+              RowBox[{
+               RowBox[{"Interpreter", "[", "\"\<Integer\>\"", "]"}], "[", 
+               RowBox[{"#", "[", 
+                RowBox[{"[", "4", "]"}], "]"}], "]"}]}], "/.", 
+             RowBox[{"{", 
+              RowBox[{"_Missing", "\[Rule]", "0"}], "}"}]}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"\"\<deaths\>\"", "\[Rule]", 
+             RowBox[{
+              RowBox[{"Interpreter", "[", "\"\<Integer\>\"", "]"}], "[", 
+              RowBox[{"#", "[", 
+               RowBox[{"[", "5", "]"}], "]"}], "]"}]}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{"\"\<recoveries\>\"", "\[Rule]", 
+             RowBox[{
+              RowBox[{"Interpreter", "[", "\"\<Integer\>\"", "]"}], "[", 
+              RowBox[{"Last", "[", "#", "]"}], "]"}]}]}], 
+           "\[IndentingNewLine]", "|>"}], "&"}], ",", 
+         RowBox[{"DeleteCases", "[", 
+          RowBox[{
+           RowBox[{"Rest", "[", "data", "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"\"\<\>\"", ".."}], "}"}]}], "]"}]}], "]"}], "//", 
+       "Dataset"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"countries", "=", 
+      RowBox[{"Join", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         TemplateBox[{"\"Alaska, United States\"", 
+           RowBox[{"Entity", "[", 
+             RowBox[{"\"AdministrativeDivision\"", ",", 
+               RowBox[{"{", 
+                 RowBox[{"\"Alaska\"", ",", "\"UnitedStates\""}], "}"}]}], 
+             "]"}], "\"Entity[\\\"AdministrativeDivision\\\", \
+{\\\"Alaska\\\", \\\"UnitedStates\\\"}]\"", "\"administrative division\""},
+          "Entity"], "}"}], ",", 
+        RowBox[{
+         TemplateBox[{"\"world\"", 
+           RowBox[{"Entity", "[", 
+             RowBox[{"\"GeographicRegion\"", ",", "\"World\""}], "]"}], 
+           "\"Entity[\\\"GeographicRegion\\\", \\\"World\\\"]\"", 
+           "\"geographic region\""},
+          "Entity"], "[", 
+         TemplateBox[{"\"countries\"", 
+           RowBox[{"EntityProperty", "[", 
+             RowBox[{"\"GeographicRegion\"", ",", "\"Countries\""}], "]"}], 
+           "\"EntityProperty[\\\"GeographicRegion\\\", \\\"Countries\\\"]\""},
+          "EntityProperty"], "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"max", "=", 
+      RowBox[{"Max", "@", 
+       RowBox[{"Normal", "[", 
+        RowBox[{"ds", "[", 
+         RowBox[{"All", ",", 
+          RowBox[{
+           RowBox[{"Log", "[", 
+            RowBox[{"1", "+", 
+             RowBox[{"N", "[", "#cases", "]"}]}], "]"}], "&"}]}], "]"}], 
+        "]"}]}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"date", "=", 
+      RowBox[{"Echo", "@", 
+       RowBox[{"ds", "[", 
+        RowBox[{"1", ",", "\"\<date\>\""}], "]"}]}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"map", "=", 
+      RowBox[{"Graphics", "[", 
+       RowBox[{
+        RowBox[{"{", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"EdgeForm", "[", 
+             RowBox[{"{", 
+              RowBox[{"White", ",", 
+               RowBox[{"AbsoluteThickness", "[", "0.1", "]"}]}], "}"}], "]"}],
+             ",", 
+            RowBox[{"FaceForm", "[", "Gray", "]"}], ",", 
+            RowBox[{"Map", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"#", "[", "\"\<Polygon\>\"", "]"}], "&"}], ",", 
+              "countries"}], "]"}]}], "}"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"Map", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"EdgeForm", "[", "White", "]"}], ",", 
+               RowBox[{"FaceForm", "[", 
+                RowBox[{"Blend", "[", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"LightOrange", ",", "Red"}], "}"}], ",", 
+                  RowBox[{
+                   RowBox[{"Log", "[", 
+                    RowBox[{"1", "+", 
+                    RowBox[{"N", "[", "#cases", "]"}]}], "]"}], "/", 
+                   "max"}]}], "]"}], "]"}], ",", 
+               RowBox[{"#region", "[", "\"\<Polygon\>\"", "]"}]}], "}"}], 
+             "&"}], ",", 
+            RowBox[{"Normal", "[", 
+             RowBox[{"ds", "[", 
+              RowBox[{"All", ",", 
+               RowBox[{
+                RowBox[{"<|", 
+                 RowBox[{
+                  RowBox[{"\"\<region\>\"", "\[Rule]", 
+                   RowBox[{"If", "[", 
+                    RowBox[{
+                    RowBox[{"MissingQ", "[", "#region", "]"}], ",", 
+                    "#country", ",", "#region"}], "]"}]}], ",", 
+                  RowBox[{"\"\<cases\>\"", "\[Rule]", "#cases"}]}], "|>"}], 
+                "&"}]}], "]"}], "]"}]}], "]"}]}], "\[IndentingNewLine]", 
+         "}"}], ",", 
+        RowBox[{"ImageSize", "\[Rule]", "1024"}], ",", 
+        RowBox[{"Background", "\[Rule]", "White"}], ",", 
+        RowBox[{"PlotLabel", "\[Rule]", 
+         RowBox[{"DateString", "[", "date", "]"}]}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Export", "[", 
+      RowBox[{
+       RowBox[{"\"\<D:\\\\coronavirus\\\\out-\>\"", "<>", 
+        RowBox[{"IntegerString", "[", 
+         RowBox[{"n", ",", "10", ",", "3"}], "]"}], "<>", "\"\<.png\>\""}], 
+       ",", "map"}], "]"}]}]}], "\[IndentingNewLine]", "]"}]}]], "Input",
+ CellChangeTimes->{{3.789487061676094*^9, 3.789487184461237*^9}, {
+  3.7894872236586018`*^9, 3.7894872246696067`*^9}, {3.789487543553385*^9, 
+  3.78948754395741*^9}, {3.7894876036212068`*^9, 3.789487607201437*^9}, {
+  3.7894876851694016`*^9, 3.7894876884616113`*^9}, {3.789487732164366*^9, 
+  3.789487766514496*^9}, {3.7894878234010024`*^9, 3.789487836008792*^9}, {
+  3.7894881589774427`*^9, 3.7894881655358343`*^9}, {3.7894885446720667`*^9, 
+  3.7894885462531595`*^9}, {3.7894889272886286`*^9, 3.7894889348710413`*^9}, {
+  3.7894895090062695`*^9, 3.789489532157465*^9}, {3.78948957932687*^9, 
+  3.7894895948606634`*^9}, {3.7894897847128034`*^9, 3.789489810446116*^9}, {
+  3.7894898584925013`*^9, 3.789489865391842*^9}, {3.7894899940512114`*^9, 
+  3.789489994596242*^9}, {3.7894901256797066`*^9, 3.7894901261957273`*^9}},
+ CellLabel->
+  "In[160]:=",ExpressionUUID->"b3376491-d7a5-428a-bbe0-fce4ad556c38"],
+
+Cell["Compute a map for every day or time interval:", "Text",
+ CellChangeTimes->{{3.789491071653929*^9, 
+  3.7894910840944686`*^9}},ExpressionUUID->"1754df83-96a0-4f7a-8ae7-\
+b73a7ef0cffa"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Table", "[", 
+  RowBox[{
+   RowBox[{"ComputeCoronaVirusMap", "[", 
+    RowBox[{
+     RowBox[{"xlsx", "[", 
+      RowBox[{"[", "i", "]"}], "]"}], ",", 
+     RowBox[{"1", "+", 
+      RowBox[{"Length", "[", "xlsx", "]"}], "-", "i"}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"i", ",", 
+     RowBox[{"Length", "[", "xlsx", "]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.7894871878532705`*^9, 3.7894872012993917`*^9}, {
+  3.789487232049675*^9, 3.789487264019969*^9}},
+ CellLabel->
+  "In[161]:=",ExpressionUUID->"4b2b4818-2732-4fee-a35b-c96242060d39"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Thu 30 Jan 2020 21:30:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "30", ",", "21", ",", "30", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901294808846`*^9},ExpressionUUID->"ba273ba3-5105-4091-b546-\
+5602182c15bb"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Thu 30 Jan 2020 11:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "30", ",", "11", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901316259866`*^9},ExpressionUUID->"582306e2-0eec-4b80-ae4f-\
+7a7814090142"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Wed 29 Jan 2020 21:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "29", ",", "21", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901338660984`*^9},ExpressionUUID->"24ef06f5-df82-4960-93b8-\
+260d4a7b033a"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Wed 29 Jan 2020 14:30:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "29", ",", "14", ",", "30", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490135914192*^9},ExpressionUUID->"012f8878-7d3c-41f0-82ea-\
+ed5307847a90"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Wed 29 Jan 2020 13:30:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "29", ",", "13", ",", "30", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490137925288*^9},ExpressionUUID->"7e648809-b514-4e80-9a9a-\
+39a64df42e13"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Tue 28 Jan 2020 23:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "28", ",", "23", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901398933864`*^9},ExpressionUUID->"99533a60-8c70-4a27-a47a-\
+5b044c8fde8d"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Tue 28 Jan 2020 18:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "28", ",", "18", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901418854785`*^9},ExpressionUUID->"1132ebed-0fe3-4e04-972a-\
+246bbd403f35"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Tue 28 Jan 2020 13:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "28", ",", "13", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490143859571*^9},ExpressionUUID->"39b39b2c-83c5-4365-9320-\
+33d307203941"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Mon 27 Jan 2020 20:30:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "27", ",", "20", ",", "30", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901458206625`*^9},ExpressionUUID->"e30655bf-0d3d-4b94-a515-\
+8f9aa76b7d46"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Mon 27 Jan 2020 19:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "27", ",", "19", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901477587595`*^9},ExpressionUUID->"89a5b807-db01-48ca-b564-\
+46f38b623825"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Mon 27 Jan 2020 09:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{"2020", ",", "1", ",", "27", ",", "9", ",", "0", ",", "0`"}],
+          "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901496458545`*^9},ExpressionUUID->"e32383a8-7775-4a3a-80ef-\
+6038170caaa2"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Sun 26 Jan 2020 23:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "26", ",", "23", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901515089397`*^9},ExpressionUUID->"1ae8b75c-19d2-429c-9ed9-\
+1fda8b354864"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Sun 26 Jan 2020 11:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "26", ",", "11", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901533270264`*^9},ExpressionUUID->"1b1e9b69-b788-4b9a-8cd1-\
+da3dc2531004"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Sat 25 Jan 2020 22:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "25", ",", "22", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490155053113*^9},ExpressionUUID->"cb2e812c-c8e3-4206-b85d-\
+476a7df1e180"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Sat 25 Jan 2020 12:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "25", ",", "12", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901566741877`*^9},ExpressionUUID->"b8ffd62b-5790-4bba-b098-\
+50037211683f"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Sat 25 Jan 2020 00:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{"2020", ",", "1", ",", "25", ",", "0", ",", "0", ",", "0`"}],
+          "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490158233261*^9},ExpressionUUID->"0f65459b-cb4b-4bd7-97c4-\
+df9619e98845"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Fri 24 Jan 2020 12:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "24", ",", "12", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490159725333*^9},ExpressionUUID->"ad2a95b7-4950-4895-9094-\
+b6591970208b"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Fri 24 Jan 2020 00:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{"2020", ",", "1", ",", "24", ",", "0", ",", "0", ",", "0`"}],
+          "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490161159401*^9},ExpressionUUID->"f0da25a8-caf4-4b3e-acde-\
+963c3984e6ae"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Thu 23 Jan 2020 12:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "23", ",", "12", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.789490162647473*^9},ExpressionUUID->"f569df2a-12e1-4dda-a94a-\
+6e094e218339"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Wed 22 Jan 2020 12:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2020", ",", "1", ",", "22", ",", "12", ",", "0", ",", "0`"}], 
+         "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901641135454`*^9},ExpressionUUID->"92564283-f3c2-4810-ab31-\
+400106cb7321"],
+
+Cell[BoxData[
+ TemplateBox[{
+   RowBox[{"\"Tue 21 Jan 2020 00:00:00\"", 
+     StyleBox[
+      RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+        StyleBox[
+         RowBox[{"-", "6`"}], NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{"2020", ",", "1", ",", "21", ",", "0", ",", "0", ",", "0`"}],
+          "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+       RowBox[{"-", "6`"}]}], "]"}]},
+  "DateObject",
+  Editable->False]], "Echo",
+ CellChangeTimes->{
+  3.7894901664616556`*^9},ExpressionUUID->"4b557c24-7501-4ed7-94a2-\
+b7cafff13fcc"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"\<\"D:\\\\coronavirus\\\\out-021.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-020.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-019.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-018.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-017.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-016.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-015.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-014.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-013.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-012.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-011.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-010.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-009.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-008.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-007.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-006.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-005.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-004.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-003.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-002.png\"\>", 
+   ",", "\<\"D:\\\\coronavirus\\\\out-001.png\"\>"}], "}"}]], "Output",
+ CellChangeTimes->{3.789490032408103*^9, 3.7894901681067314`*^9},
+ CellLabel->
+  "Out[161]=",ExpressionUUID->"509ac28a-7b58-4005-b4a7-ff855e83ca9d"]
+}, Open  ]],
+
+Cell["Read in the saved PNG images:", "Text",
+ CellChangeTimes->{{3.789491095782979*^9, 
+  3.789491103359309*^9}},ExpressionUUID->"8636c769-44b7-4c23-ad1f-\
+3494e905c7d5"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"res", "=", 
+   RowBox[{"Map", "[", 
+    RowBox[{"Import", ",", 
+     RowBox[{"FileNames", "[", 
+      RowBox[{"\"\<*.png\>\"", ",", "\"\<D:\\\\coronavirus\>\""}], "]"}]}], 
+    "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.7894874703767185`*^9, 3.789487498048484*^9}, {
+   3.7894880758204393`*^9, 3.789488077519541*^9}, {3.78948967288008*^9, 
+   3.789489673466109*^9}, 3.7894901713418894`*^9},
+ CellLabel->
+  "In[162]:=",ExpressionUUID->"19885f83-211a-4907-8c18-3da202b6d9d0"],
+
+Cell["Export them as an animated GIF:", "Text",
+ CellChangeTimes->{{3.7894911069674683`*^9, 
+  3.789491113695761*^9}},ExpressionUUID->"ff338e91-b750-4348-9149-\
+997be4d64710"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Export", "[", 
+  RowBox[{"\"\<D:\\\\tmp\\\\out.gif\>\"", ",", "res", ",", 
+   RowBox[{"\"\<DisplayDurations\>\"", "\[Rule]", "1"}], ",", 
+   RowBox[{"AnimationRepetitions", "->", "Infinity"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.789489166969658*^9, 3.7894891776952376`*^9}, {
+  3.7894896523675933`*^9, 3.789489721448558*^9}, {3.7894900403364973`*^9, 
+  3.789490067670848*^9}},
+ CellLabel->
+  "In[163]:=",ExpressionUUID->"fcea5a32-2345-4bd0-9be3-2890e968468a"],
+
+Cell[BoxData["\<\"D:\\\\tmp\\\\out.gif\"\>"], "Output",
+ CellChangeTimes->{{3.789490042966629*^9, 3.7894900713260317`*^9}, 
+   3.7894901798422966`*^9},
+ CellLabel->
+  "Out[163]=",ExpressionUUID->"7af6b41e-c867-437c-9388-388a91ba8c7a"]
+}, Open  ]],
+
+Cell["Copy final GIF to the GitHub repository:", "Text",
+ CellChangeTimes->{{3.7894911269763412`*^9, 
+  3.7894911385438476`*^9}},ExpressionUUID->"6a9be6d2-5003-4a8b-95c8-\
+08bb1cf3701c"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"CopyFile", "[", 
+  RowBox[{
+  "\"\<D:\\\\tmp\\\\out.gif\>\"", ",", 
+   "\"\<D:\\\\git\\\\coronavirus\\\\out.gif\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.7894902004632845`*^9, 3.789490224885454*^9}},
+ CellLabel->
+  "In[164]:=",ExpressionUUID->"89ba4555-40a3-41eb-8d92-d1fa2afebeb9"],
+
+Cell[BoxData["\<\"D:\\\\git\\\\coronavirus\\\\out.gif\"\>"], "Output",
+ CellChangeTimes->{3.789490226782549*^9},
+ CellLabel->
+  "Out[164]=",ExpressionUUID->"8bfcafa3-67e9-43cc-ab98-c58e829d5c8e"]
+}, Open  ]],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.789491144130092*^9, 
+  3.7894911443851037`*^9}},ExpressionUUID->"faefe00f-5c74-4358-a0ca-\
+60ad47518a60"]
+}, Open  ]]
+},
+WindowSize->{960, 1018},
+WindowMargins->{{Automatic, -5.5}, {Automatic, -5.5}},
+TaggingRules->{
+ "DocuToolsSettingsInternal" -> {
+   "$PacletVersion" -> "0.10.2203", "$ApplicationName" -> "smartcvs", 
+    "$LinkBase" -> "smartcvs", "$ApplicationDirectory" -> "D:\\smartcvs\\", 
+    "$DocumentationDirectory" -> "D:\\smartcvs\\English\\", 
+    "$UseNewPageDialog" -> ""}, "TryRealOnly" -> False},
+FrontEndVersion->"12.1 for Microsoft Windows (64-bit) (January 29, 2020)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"6f7bc24c-f7c9-4c5f-a50f-a0002b81d232"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 181, 3, 98, "Title",ExpressionUUID->"5ef32a59-2eb0-464c-9421-2f95fb331b31"],
+Cell[764, 27, 165, 3, 53, "Subtitle",ExpressionUUID->"d91b195f-a3e5-43b2-a162-257a1af4c1a2"],
+Cell[932, 32, 178, 3, 34, "Text",ExpressionUUID->"d3e01a62-b50d-4d80-9af6-a423bab6ce4b"],
+Cell[1113, 37, 480, 10, 28, "Input",ExpressionUUID->"31aa7e4e-9860-4386-8557-4842025c3765"],
+Cell[1596, 49, 184, 3, 34, "Text",ExpressionUUID->"a02f6c14-4339-4fa1-ae10-762609af9074"],
+Cell[1783, 54, 364, 7, 28, "Input",ExpressionUUID->"27ab572f-fac8-4aa2-bb09-23bdcc5a846a"],
+Cell[2150, 63, 217, 5, 34, "Text",ExpressionUUID->"bc14904b-ad77-4963-af4d-285147f3879e"],
+Cell[2370, 70, 7835, 178, 408, "Input",ExpressionUUID->"b3376491-d7a5-428a-bbe0-fce4ad556c38"],
+Cell[10208, 250, 189, 3, 34, "Text",ExpressionUUID->"1754df83-96a0-4f7a-8ae7-b73a7ef0cffa"],
+Cell[CellGroupData[{
+Cell[10422, 257, 582, 15, 28, "Input",ExpressionUUID->"4b2b4818-2732-4fee-a35b-c96242060d39"],
+Cell[CellGroupData[{
+Cell[11029, 276, 680, 19, 35, "Echo",ExpressionUUID->"ba273ba3-5105-4091-b546-5602182c15bb"],
+Cell[11712, 297, 679, 19, 35, "Echo",ExpressionUUID->"582306e2-0eec-4b80-ae4f-7a7814090142"],
+Cell[12394, 318, 679, 19, 35, "Echo",ExpressionUUID->"24ef06f5-df82-4960-93b8-260d4a7b033a"],
+Cell[13076, 339, 678, 19, 35, "Echo",ExpressionUUID->"012f8878-7d3c-41f0-82ea-ed5307847a90"],
+Cell[13757, 360, 678, 19, 35, "Echo",ExpressionUUID->"7e648809-b514-4e80-9a9a-39a64df42e13"],
+Cell[14438, 381, 679, 19, 35, "Echo",ExpressionUUID->"99533a60-8c70-4a27-a47a-5b044c8fde8d"],
+Cell[15120, 402, 679, 19, 35, "Echo",ExpressionUUID->"1132ebed-0fe3-4e04-972a-246bbd403f35"],
+Cell[15802, 423, 677, 19, 35, "Echo",ExpressionUUID->"39b39b2c-83c5-4365-9320-33d307203941"],
+Cell[16482, 444, 680, 19, 35, "Echo",ExpressionUUID->"e30655bf-0d3d-4b94-a515-8f9aa76b7d46"],
+Cell[17165, 465, 679, 19, 35, "Echo",ExpressionUUID->"89a5b807-db01-48ca-b564-46f38b623825"],
+Cell[17847, 486, 667, 18, 35, "Echo",ExpressionUUID->"e32383a8-7775-4a3a-80ef-6038170caaa2"],
+Cell[18517, 506, 679, 19, 35, "Echo",ExpressionUUID->"1ae8b75c-19d2-429c-9ed9-1fda8b354864"],
+Cell[19199, 527, 679, 19, 35, "Echo",ExpressionUUID->"1b1e9b69-b788-4b9a-8cd1-da3dc2531004"],
+Cell[19881, 548, 677, 19, 35, "Echo",ExpressionUUID->"cb2e812c-c8e3-4206-b85d-476a7df1e180"],
+Cell[20561, 569, 679, 19, 35, "Echo",ExpressionUUID->"b8ffd62b-5790-4bba-b098-50037211683f"],
+Cell[21243, 590, 665, 18, 35, "Echo",ExpressionUUID->"0f65459b-cb4b-4bd7-97c4-df9619e98845"],
+Cell[21911, 610, 677, 19, 35, "Echo",ExpressionUUID->"ad2a95b7-4950-4895-9094-b6591970208b"],
+Cell[22591, 631, 665, 18, 35, "Echo",ExpressionUUID->"f0da25a8-caf4-4b3e-acde-963c3984e6ae"],
+Cell[23259, 651, 677, 19, 35, "Echo",ExpressionUUID->"f569df2a-12e1-4dda-a94a-6e094e218339"],
+Cell[23939, 672, 679, 19, 35, "Echo",ExpressionUUID->"92564283-f3c2-4810-ab31-400106cb7321"],
+Cell[24621, 693, 667, 18, 35, "Echo",ExpressionUUID->"4b557c24-7501-4ed7-94a2-b7cafff13fcc"]
+}, Open  ]],
+Cell[25303, 714, 1311, 25, 130, "Output",ExpressionUUID->"509ac28a-7b58-4005-b4a7-ff855e83ca9d"]
+}, Open  ]],
+Cell[26629, 742, 171, 3, 34, "Text",ExpressionUUID->"8636c769-44b7-4c23-ad1f-3494e905c7d5"],
+Cell[26803, 747, 513, 12, 28, "Input",ExpressionUUID->"19885f83-211a-4907-8c18-3da202b6d9d0"],
+Cell[27319, 761, 175, 3, 34, "Text",ExpressionUUID->"ff338e91-b750-4348-9149-997be4d64710"],
+Cell[CellGroupData[{
+Cell[27519, 768, 488, 9, 28, "Input",ExpressionUUID->"fcea5a32-2345-4bd0-9be3-2890e968468a"],
+Cell[28010, 779, 234, 4, 32, "Output",ExpressionUUID->"7af6b41e-c867-437c-9388-388a91ba8c7a"]
+}, Open  ]],
+Cell[28259, 786, 186, 3, 34, "Text",ExpressionUUID->"6a9be6d2-5003-4a8b-95c8-08bb1cf3701c"],
+Cell[CellGroupData[{
+Cell[28470, 793, 311, 7, 28, "Input",ExpressionUUID->"89ba4555-40a3-41eb-8d92-d1fa2afebeb9"],
+Cell[28784, 802, 195, 3, 32, "Output",ExpressionUUID->"8bfcafa3-67e9-43cc-ab98-c58e829d5c8e"]
+}, Open  ]],
+Cell[28994, 808, 154, 3, 28, "Input",ExpressionUUID->"faefe00f-5c74-4358-a0ca-60ad47518a60"]
+}, Open  ]]
+}
+]
+*)
+
